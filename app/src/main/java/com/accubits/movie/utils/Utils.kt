@@ -1,9 +1,14 @@
 package com.accubits.movie.utils
 
+import android.app.AlertDialog
 import android.content.Context
+import android.content.DialogInterface
+import android.net.ConnectivityManager
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.core.content.ContextCompat
+import com.accubits.movie.R
 import com.google.android.material.snackbar.Snackbar
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -66,4 +71,29 @@ fun convertDateTime(aDataValue: String, originaL_DATETIME_FORAMT: String,
         ex.printStackTrace()
     }
     return dateString
+}
+
+fun isInternetOn(aContext: Context): Boolean {
+    val connectivityManager =
+            aContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val networkInfo = connectivityManager.activeNetworkInfo
+    return networkInfo != null && networkInfo.isConnected
+}
+
+
+fun showAlert(aContext: Context, aMessage: String) {
+    try {
+        val builder = AlertDialog.Builder(aContext)
+        builder.setMessage(aMessage).setTitle(aContext.getString(R.string.app_name))
+                .setCancelable(false).setPositiveButton("OK") { dialog, id ->
+                    dialog.dismiss()
+                }
+        val alert = builder.create()
+        alert.show()
+        // Change the buttons color in dialog
+        val pbutton = alert.getButton(DialogInterface.BUTTON_POSITIVE)
+        pbutton.setTextColor(ContextCompat.getColor(aContext, R.color.purple_500))
+    } catch (e: Exception) {
+        e.printStackTrace()
+    }
 }

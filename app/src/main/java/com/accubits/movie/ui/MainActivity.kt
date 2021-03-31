@@ -8,6 +8,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.accubits.movie.R
 import com.accubits.movie.data.db.entities.MovieList
+import com.accubits.movie.utils.hide
+import com.accubits.movie.utils.isInternetOn
+import com.accubits.movie.utils.show
+import com.accubits.movie.utils.showAlert
 import kotlinx.android.synthetic.main.activity_main.*
 import org.codejudge.application.adapter.CategoryAdapter
 
@@ -22,14 +26,21 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         mMainViewModel =
-            ViewModelProvider(this, MainViewModelFactory(this)).get(MainViewModel::class.java)
+                ViewModelProvider(this, MainViewModelFactory(this)).get(MainViewModel::class.java)
 
         setAdapter()
-        mMainViewModel.getMovieList()
 
-        mMainViewModel.mMovieLiveData.observe(this, object : Observer<ArrayList<HashMap<String,ArrayList<MovieList>>>> {
-            override fun onChanged(t: ArrayList<HashMap<String,ArrayList<MovieList>>>?) {
 
+        if (isInternetOn(this)) {
+            progress_bar.show()
+            mMainViewModel.getMovieList()
+        } else {
+            showAlert(this, getString(R.string.alert_check_internet))
+        }
+
+        mMainViewModel.mMovieLiveData.observe(this, object : Observer<ArrayList<HashMap<String, ArrayList<MovieList>>>> {
+            override fun onChanged(t: ArrayList<HashMap<String, ArrayList<MovieList>>>?) {
+                progress_bar.hide()
                 if (!t.isNullOrEmpty())
                     mCategoryAdapter.update(t)
             }
